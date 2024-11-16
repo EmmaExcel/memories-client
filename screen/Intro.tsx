@@ -81,7 +81,7 @@ export default function Intro() {
           className="mb-12 space-y-4"
         >
           <TouchableOpacity
-            onPress={() => navigation.navigate("memory")}
+            onPress={() => navigation.navigate("memory" as never)}
             className="bg-white py-4 mb-4 rounded-full"
           >
             <Text className="text-black text-center font-semibold text-lg">

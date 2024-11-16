@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -16,6 +17,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import { API_URL } from "../api";
+import { useMemory } from "../context/memoryContext";
 
 const { width } = Dimensions.get("window");
 
@@ -29,10 +31,12 @@ export default function AddMemory() {
   const [author, setAuthor] = useState("");
   const [content, setContent] = useState("");
   const [images, setImages] = useState<ImageItem[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const { handleFetch } = useMemory();
 
   const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: "Images",
       allowsMultipleSelection: true,
       quality: 1,
       aspect: [4, 3],
@@ -50,31 +54,57 @@ export default function AddMemory() {
   const navigation = useNavigation();
 
   const handleBack = () => {
-    navigation.navigate("memory");
+    navigation.navigate("memory" as never);
   };
 
   const handleSave = async () => {
+    setIsLoading(true);
     try {
-      if (!title || !author || !content) {
-        alert("Please fill in all fields");
-        return;
-      }
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("author", author);
+      formData.append("content", content);
 
-      const newMemory = {
-        title,
-        author,
-        content,
-        images: images.map((img) => img.uri),
-      };
+      // Correctly append each image to formData
+      images.forEach((image, index) => {
+        const imageUri = image.uri;
+        const filename = imageUri.split("/").pop();
 
-      const response = await axios.post(API_URL + "/memory", newMemory);
-      console.log(response.data);
-      navigation.navigate("memory");
-    } catch (error) {
-      console.log(error);
-      alert("An error occurred, please try again.");
+        // Create the file object
+        const file = {
+          uri: imageUri,
+          type: "image/jpeg",
+          name: filename || `image-${index}.jpg`,
+        };
+
+        // Append each image as a separate file
+        formData.append("images", file as any);
+      });
+      const response = await axios.post(API_URL + "/memory", formData, {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      setIsLoading(false);
+
+      navigation.navigate("memory" as never);
+    } catch (error: any) {
+      console.log("Error details:", error.response?.data || error.message);
+      setIsLoading(false);
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <SafeAreaView className="flex-1 bg-[#1A1A1A]">
+        <StatusBar style="light" />
+        <ActivityIndicator />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-[#1A1A1A]">

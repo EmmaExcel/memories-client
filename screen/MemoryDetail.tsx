@@ -17,24 +17,37 @@ const { width } = Dimensions.get("window");
 
 export default function MemoryDetails() {
   const navigation = useNavigation();
-  const route = useRoute();
-  const memory = route.params?.memory;
+  const route = useRoute<{
+    key: string;
+    name: string;
+    params: {
+      memory: {
+        _id: string;
+        title: string;
+        content: string;
+        images: string[];
+        date: string;
+        author: string;
+      };
+    };
+  }>();
+  const memory = route.params.memory;
 
   return (
-    <SafeAreaView className="flex-1  bg-[#1A1A1A]">
+    <View className="flex-1  bg-[#1A1A1A]">
       <StatusBar style="light" />
 
       {/* Header */}
       <MotiView
         from={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="absolute top-12 left-0 right-0 z-10 px-6 py-4"
+        className="absolute top-12 left-0 right-0 z-10 px-3 py-4"
       >
         <TouchableOpacity
-          onPress={() => navigation.navigate("memory")}
-          className="bg-black/40 p-1 rounded-full w-10 h-10 items-center justify-center"
+          onPress={() => navigation.navigate("memory" as never)}
+          className="bg-black/40 p-1 rounded-full w-9 h-9 items-center justify-center"
         >
-          <Feather name="arrow-left" size={24} color="white" />
+          <Feather name="arrow-left" size={20} color="white" />
         </TouchableOpacity>
       </MotiView>
 
@@ -51,7 +64,7 @@ export default function MemoryDetails() {
                 key={index}
                 source={{ uri: image }}
                 style={{ width, height: 400 }}
-                contentFit="contain"
+                contentFit="cover"
                 recyclingKey={memory._id + index}
               />
             </View>
@@ -112,7 +125,7 @@ export default function MemoryDetails() {
       </ScrollView>
 
       {/* Bottom Actions */}
-      <MotiView
+      {/* <MotiView
         from={{ translateY: 50 }}
         animate={{ translateY: 0 }}
         className="flex-row items-center justify-around py-4 px-6 border-t border-gray-800"
@@ -129,7 +142,7 @@ export default function MemoryDetails() {
           <Feather name="bookmark" size={24} color="white" />
           <Text className="text-white ml-1">Save</Text>
         </TouchableOpacity>
-      </MotiView>
-    </SafeAreaView>
+      </MotiView> */}
+    </View>
   );
 }
