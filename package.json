@@ -54,7 +54,11 @@
   "expo": {
     "doctor": {
       "reactNativeDirectoryCheck": {
-        "listUnknownPackages": false
+        "exclude": [
+          "firebase",
+          "react-loading-indicators",
+          "tailwindcss"
+        ]
       }
     }
   },
