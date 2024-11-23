@@ -3,12 +3,12 @@ import { initializeAuth, getReactNativePersistence } from "firebase/auth";
 import * as SecureStore from "expo-secure-store";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBuDpx_Pk_cwxtPbB_i_NXHFOGQ4Of7nLA",
-  authDomain: "memories-654b1.firebaseapp.com",
-  projectId: "memories-654b1",
-  storageBucket: "memories-654b1.firebasestorage.app",
-  messagingSenderId: "1062132350432",
-  appId: "1:1062132350432:web:a9146c54205d60c5d4bf85",
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+  projectId: process.envFIREBASE_PROJECT_ID,
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.FIREBASE_APP_ID,
 };
 
 const app = initializeApp(firebaseConfig);

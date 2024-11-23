@@ -5,12 +5,12 @@ import { TextInput } from "react-native-gesture-handler";
 import { Image } from "expo-image";
 import * as Google from "expo-auth-session/providers/google";
 import { useUserContext } from "../../context/userContext";
-import {
-  GoogleAuthProvider,
-  signInWithCredential,
-  signInWithPopup,
-} from "firebase/auth";
-import { auth } from "../../firebase";
+// import {
+//   GoogleAuthProvider,
+//   signInWithCredential,
+//   signInWithPopup,
+// } from "firebase/auth";
+// import { auth } from "../../firebase";
 
 export default function Auth() {
   const { isLogin, setIsLogin }: any = useUserContext();
@@ -117,28 +117,28 @@ const RegisterSection = ({ switchToLogin }: any) => {
 const GoogleButton = () => {
   const { handleGoogleAuth }: any = useUserContext();
 
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    webClientId:
-      "511823124998-b4qduvlev1dfque32qc1qfstlcgmqs4q.apps.googleusercontent.com",
-    iosClientId:
-      "511823124998-jd0k9a3fpeklu6h3jkd7f6bbq6f53pvu.apps.googleusercontent.com",
-    androidClientId:
-      "511823124998-ddfrm6k0sbeilt8g75pv4mhifiavs4q9.apps.googleusercontent.com",
-  });
+  // const [request, response, promptAsync] = Google.useAuthRequest({
+  //   webClientId:
+  //     "511823124998-b4qduvlev1dfque32qc1qfstlcgmqs4q.apps.googleusercontent.com",
+  //   iosClientId:
+  //     "511823124998-jd0k9a3fpeklu6h3jkd7f6bbq6f53pvu.apps.googleusercontent.com",
+  //   androidClientId:
+  //     "511823124998-ddfrm6k0sbeilt8g75pv4mhifiavs4q9.apps.googleusercontent.com",
+  // });
 
-  useEffect(() => {
-    if (response?.type === "success") {
-      const { id_token } = response.params;
-      const credential = GoogleAuthProvider.credential(id_token);
-      signInWithCredential(auth, credential).then((result) => {
-        handleGoogleAuth(id_token);
-      });
-    }
-  }, [response]);
+  // useEffect(() => {
+  //   if (response?.type === "success") {
+  //     const { id_token } = response.params;
+  //     const credential = GoogleAuthProvider.credential(id_token);
+  //     signInWithCredential(auth, credential).then((result) => {
+  //       handleGoogleAuth(id_token);
+  //     });
+  //   }
+  // }, [response]);
 
   return (
     <TouchableOpacity
-      onPress={() => promptAsync()}
+      // onPress={() => promptAsync()}
       className="flex-row gap-x-4 bg-[#67676730] h-14 mt-3 rounded-lg items-center justify-center"
     >
       <Image
