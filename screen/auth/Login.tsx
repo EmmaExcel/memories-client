@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TextInput } from "react-native-gesture-handler";
 import { Image } from "expo-image";
-import * as Google from "expo-auth-session/providers/google";
+
 import { useUserContext } from "../../context/userContext";
 // import {
 //   GoogleAuthProvider,
