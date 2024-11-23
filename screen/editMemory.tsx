@@ -7,16 +7,16 @@ import {
   Dimensions,
   ActivityIndicator,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { Image } from "expo-image";
 import { MotiView } from "moti";
 import { Feather } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import axios from "axios";
-import { API_URL } from "../api";
+import { API, API_URL } from "../api";
 import { useMemory } from "../context/memoryContext";
 
 const { width } = Dimensions.get("window");
@@ -26,7 +26,7 @@ interface ImageItem {
   isLocal: boolean;
 }
 
-export default function AddMemory() {
+export default function EditMemory() {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [content, setContent] = useState("");
@@ -34,9 +34,38 @@ export default function AddMemory() {
   const [isLoading, setIsLoading] = useState(false);
   const { handleFetch } = useMemory();
 
+  const route = useRoute<{
+    key: string;
+    name: string;
+    params: {
+      memory: {
+        _id: string;
+        title: string;
+        content: string;
+        images: string[];
+        date: string;
+        author: string;
+      };
+    };
+  }>();
+  const memory = route.params.memory;
+
+  useEffect(() => {
+    // Populate existing memory data
+    setTitle(memory.title);
+    setAuthor(memory.author);
+    setContent(memory.content);
+    setImages(
+      memory.images.map((imageUrl) => ({
+        uri: `${API_URL}/uploads/${imageUrl}`, // Assuming the images are served from a folder named "uploads"
+        isLocal: false,
+      }))
+    );
+  }, [memory]);
+
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: "Images",
+      mediaTypes: "images",
       allowsMultipleSelection: true,
       quality: 1,
       aspect: [4, 3],
@@ -65,35 +94,42 @@ export default function AddMemory() {
       formData.append("author", author);
       formData.append("content", content);
 
-      // Correctly append each image to formData
+      // Upload new images only
       images.forEach((image, index) => {
-        const imageUri = image.uri;
-        const filename = imageUri.split("/").pop();
+        if (image.isLocal) {
+          const imageUri = image.uri;
+          const filename = imageUri.split("/").pop();
 
-        // Create the file object
-        const file = {
-          uri: imageUri,
-          type: "image/jpeg",
-          name: filename || `image-${index}.jpg`,
-        };
+          const file = {
+            uri: imageUri,
+            type: "image/jpeg",
+            name: filename || `image-${index}.jpg`,
+          };
 
-        // Append each image as a separate file
-        formData.append("images", file as any);
+          formData.append("images", file as any);
+        }
       });
-      const response = await axios.post(API_URL + "/memory", formData, {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "multipart/form-data",
-        },
-      });
+
+      // Include existing images (by their file name) in the payload
+      const existingImageNames = memory.images.filter(
+        (imageUrl) =>
+          !images.some((img) => img.isLocal && img.uri.includes(imageUrl))
+      );
+      formData.append("existingImages", JSON.stringify(existingImageNames));
+
+      await API.put(`/memory/${memory._id}`, formData);
+
       setIsLoading(false);
-      navigation.goBack();
+
+      navigation.navigate("memory" as never);
     } catch (error: any) {
       console.log("Error details:", error.response?.data || error.message);
       setIsLoading(false);
-    } finally {
-      setIsLoading(false);
     }
+  };
+
+  const handleDeleteImage = (uri: string) => {
+    setImages(images.filter((image) => image.uri !== uri));
   };
 
   if (isLoading) {
@@ -170,10 +206,10 @@ export default function AddMemory() {
                 className="gap-x-3"
               >
                 <TouchableOpacity
-                  className="w-20 h-20 bg-gray-800 rounded-lg items-center justify-center"
+                  className="w-20 h-20 bg-gray-800  rounded-lg items-center justify-center"
                   onPress={pickImage}
                 >
-                  <Feather name="plus" size={24} color="#666" />
+                  <Feather name="plus" size={24} color="#666" className="" />
                 </TouchableOpacity>
 
                 {images.map((image, index) => (
@@ -183,12 +219,20 @@ export default function AddMemory() {
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ type: "spring", delay: index * 100 }}
                   >
-                    <Image
-                      source={{ uri: image.uri }}
-                      style={{ width: 80, height: 80 }}
-                      className="rounded-lg"
-                      contentFit="cover"
-                    />
+                    <View>
+                      <Image
+                        source={{ uri: image }}
+                        style={{ width: 80, height: 80 }}
+                        className="rounded-lg"
+                        contentFit="cover"
+                      />
+                      <TouchableOpacity
+                        className="absolute top-1 right-1 bg-red-500 p-1 rounded-full"
+                        onPress={() => handleDeleteImage(image.uri)}
+                      >
+                        <Feather name="x" size={16} color="white" />
+                      </TouchableOpacity>
+                    </View>
                   </MotiView>
                 ))}
               </ScrollView>

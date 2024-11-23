@@ -1,6 +1,6 @@
 import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
-import { API_URL } from "../api";
+import { API, API_URL } from "../api";
 import { useNavigation } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 import * as ImagePicker from "expo-image-picker";
@@ -45,18 +45,39 @@ export const MemoryProvider = ({ children }: { children: React.ReactNode }) => {
   const [selectedMemory, setSelectedMemory] = useState(null);
   const [showToolkit, setShowToolkit] = useState(false);
   const [images, setImages] = useState<ImageItem[]>([]);
+  const [allMemories, setAllMemories] = useState<any[]>([]);
 
   //   Fetch memories from API
   const handleFetch = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get(API_URL + `/memory`);
+      const response = await API.get(`/memory`);
       setMemory(response.data.data);
       console.log("Fetch success:", response.data);
     } catch (error) {
       console.log("Fetch error:", error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const getAllMemories = async () => {
+    try {
+      const response = await API.get(`/memory`);
+      setAllMemories(response.data.data);
+      console.log("Fetch success:", response.data);
+    } catch (error) {
+      console.log("Fetch error:", error);
+    }
+  };
+
+  const getMemory = async (id: string) => {
+    try {
+      const response = await API.get(`/memory/${id}`);
+      setSelectedMemory(response.data.data);
+      console.log("Fetch success:", response.data);
+    } catch (error) {
+      console.log("Fetch error:", error);
     }
   };
 
@@ -67,7 +88,7 @@ export const MemoryProvider = ({ children }: { children: React.ReactNode }) => {
   // Delete memory from API
   const handleDelete = async (id: string) => {
     try {
-      await axios.delete(`${API_URL}/memory/${id}`);
+      await API.delete(`/memory/${id}`);
       // Immediately update local state
       setMemory((prevMemories: any) =>
         prevMemories.filter((item: any) => item._id !== id)
@@ -82,12 +103,6 @@ export const MemoryProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  //   handle Edit
-  //   const handleEdit = (item: any) => {
-  //     navigation.navigate("addmemory", { memory: item });
-  //   };
-
-  //   handle Long press
   const handleLongPress = (item: any) => {
     setSelectedMemory(item);
     setShowToolkit(true);
@@ -111,6 +126,8 @@ export const MemoryProvider = ({ children }: { children: React.ReactNode }) => {
     setIsLoading,
     images,
     setImages,
+    getAllMemories,
+    allMemories,
   ];
   return (
     <MemoryContext.Provider value={value}>{children}</MemoryContext.Provider>

@@ -7,11 +7,19 @@ import { StatusBar } from "expo-status-bar";
 import { MotiView } from "moti";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 const { height } = Dimensions.get("window");
 
+type AuthStackParamList = {
+  login: undefined;
+  special: undefined;
+};
+
+type NavigationProp = NativeStackNavigationProp<AuthStackParamList>;
+
 export default function Intro() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp>();
 
   return (
     <SafeAreaView className="flex-1 bg-[#1A1A1A]">
@@ -81,7 +89,7 @@ export default function Intro() {
           className="mb-12 space-y-4"
         >
           <TouchableOpacity
-            onPress={() => navigation.navigate("memory" as never)}
+            onPress={() => navigation.navigate("login")}
             className="bg-white py-4 mb-4 rounded-full"
           >
             <Text className="text-black text-center font-semibold text-lg">
@@ -89,11 +97,15 @@ export default function Intro() {
             </Text>
           </TouchableOpacity>
 
-          {/* <TouchableOpacity className="py-4">
+          <TouchableOpacity
+            onPress={() => navigation.navigate("special")}
+            className="py-4 flex-row items-center justify-center"
+          >
             <Text className="text-white/70 text-center">
-              Already have an account? Sign in
+              For a special someone..
             </Text>
-          </TouchableOpacity> */}
+            <Text className="text-cyan-700/70 text-center">click here</Text>
+          </TouchableOpacity>
         </MotiView>
       </View>
     </SafeAreaView>

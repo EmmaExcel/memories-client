@@ -33,6 +33,7 @@ export default function MemoryDetails() {
   }>();
   const memory = route.params.memory;
 
+  console.log(memory);
   return (
     <View className="flex-1  bg-[#1A1A1A]">
       <StatusBar style="light" />
@@ -44,7 +45,7 @@ export default function MemoryDetails() {
         className="absolute top-12 left-0 right-0 z-10 px-3 py-4"
       >
         <TouchableOpacity
-          onPress={() => navigation.navigate("memory" as never)}
+          onPress={() => navigation.goBack()}
           className="bg-black/40 p-1 rounded-full w-9 h-9 items-center justify-center"
         >
           <Feather name="arrow-left" size={20} color="white" />

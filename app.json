@@ -2,14 +2,20 @@
   "expo": {
     "name": "Memories",
     "slug": "client",
+   
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
-   
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#ffffff"
+    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+       "bundleIdentifier": "com.emmaexcel6.client"
     },
     "android": {
       "adaptiveIcon": {
@@ -33,7 +39,12 @@
             "./assets/fonts/Pacifico.ttf"
           ]
         }
-      ]
+      ],
+     [ "expo-secure-store",
+      {
+        "configureAndroidBackup": true,
+        "faceIDPermission": "Allow $(PRODUCT_NAME) to access your Face ID biometric data."
+      }]
     ],
     "extra": {
       "router": {
@@ -41,6 +52,11 @@
       },
       "eas": {
         "projectId": "8d680205-ac1d-4621-a7b4-2ce5e762f4cb"
+      },
+      "doctor": {
+        "reactNativeDirectoryCheck": {
+          "listUnknownPackages": false
+        }
       }
     }
   }
